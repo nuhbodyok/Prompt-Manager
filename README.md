@@ -2,6 +2,7 @@
 
 A self-contained, browser-based application for managing, organizing, and exporting AI prompt libraries. No backend, no installation — just save the HTML file and open it in any modern browser.
 
+**[→ Live Demo](https://nuhbodyok.github.io/Prompt-Manager/)**
 ---
 
 ## Features
