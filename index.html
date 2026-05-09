@@ -14,17 +14,26 @@
         .dark ::-webkit-scrollbar-track{background:#1e293b}
         .prompt-selected{background-color:rgba(93,92,222,.1)!important;border-color:var(--primary)!important}
         .dark .prompt-selected{background-color:rgba(93,92,222,.2)!important}
+        .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}
     </style>
+<base target="_blank">
 </head>
 <body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen">
     <div class="container mx-auto px-2 py-3 max-w-6xl">
-        <h1 class="text-2xl font-bold mb-3 text-center" style="color:var(--primary)">Prompt Collection Tool</h1>
+        <div class="flex justify-between items-center mb-3">
+                <div class="w-10"></div>
+                <h1 class="text-2xl font-bold text-center" style="color:var(--primary)">Prompt Collection Tool</h1>
+                <button id="theme-toggle" class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" aria-label="Toggle dark mode">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:block text-yellow-400"></i>
+                </button>
+            </div>
 
         <div id="drop-zone" class="mb-3 p-3 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded text-center cursor-pointer hover:border-[var(--primary)] transition-colors">
             <label class="cursor-pointer block">
                 <i class="fas fa-cloud-upload-alt text-2xl mb-1" style="color:var(--primary)"></i>
                 <div class="text-sm text-gray-500">Drop .txt/.csv files or click to browse</div>
-                <input id="file-upload" type="file" accept=".txt,.csv" multiple class="hidden"/>
+                <input id="file-upload" type="file" accept="text/plain,text/csv,.txt,.csv" multiple class="hidden"/>
             </label>
         </div>
 
@@ -34,7 +43,7 @@
                 <option value="reverse-alphabetical">Z-A</option>
                 <option value="date-imported">Newest</option>
             </select>
-            <input type="text" id="search-input" placeholder="Search..." class="flex-1 min-w-[120px] border rounded px-2 py-1 bg-white dark:bg-gray-800 text-sm"/>
+            <label for="search-input" class="sr-only">Search prompts</label><input type="text" id="search-input" placeholder="Search..." class="flex-1 min-w-[120px] border rounded px-2 py-1 bg-white dark:bg-gray-800 text-sm" aria-label="Search prompts"/>
             <button id="new-prompt-btn" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"><i class="fas fa-plus"></i> New</button>
             <button id="import-btn" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"><i class="fas fa-file-import"></i> Import</button>
             <button id="export-btn" class="text-white px-3 py-1 rounded text-sm hover:opacity-90" style="background:var(--primary)"><i class="fas fa-download"></i> Export</button>
@@ -62,7 +71,7 @@
     </div>
 
     <!-- Edit Modal -->
-    <div id="edit-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+    <div id="edit-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
         <div class="bg-white dark:bg-gray-800 rounded-lg w-full max-w-2xl max-h-[90vh] flex flex-col m-4">
             <div class="p-3 border-b flex justify-between items-center">
                 <h2 id="edit-modal-title" class="text-lg font-semibold">Edit Prompt</h2>
@@ -83,10 +92,10 @@
     </div>
 
     <!-- Import Modal -->
-    <div id="import-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+    <div id="import-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="import-modal-title">
         <div class="bg-white dark:bg-gray-800 rounded-lg w-full max-w-2xl max-h-[90vh] flex flex-col m-4">
             <div class="p-3 border-b flex justify-between items-center">
-                <h2 class="text-lg font-semibold">Import Prompts</h2>
+                <h2 id="import-modal-title" class="text-lg font-semibold">Import Prompts</h2>
                 <button id="close-import-btn" class="text-gray-500 hover:text-gray-700 p-1"><i class="fas fa-times"></i></button>
             </div>
             <div class="p-3 flex-grow overflow-auto">
@@ -120,7 +129,7 @@
     </div>
 
     <!-- Confirm Dialog -->
-    <div id="confirm-dialog" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+    <div id="confirm-dialog" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title">
         <div class="bg-white dark:bg-gray-800 rounded-lg p-4 max-w-sm w-full m-4">
             <h3 id="confirm-title" class="text-lg font-semibold mb-2">Confirm</h3>
             <p id="confirm-message" class="mb-4 text-gray-600 dark:text-gray-300 text-sm"></p>
@@ -132,9 +141,9 @@
     </div>
 
     <!-- Duplicate Dialog -->
-    <div id="dup-dialog" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+    <div id="dup-dialog" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="dup-dialog-title">
         <div class="bg-white dark:bg-gray-800 rounded-lg p-4 max-w-sm w-full m-4">
-            <h3 class="text-lg font-semibold mb-2">Duplicate Found</h3>
+            <h3 id="dup-dialog-title" class="text-lg font-semibold mb-2">Duplicate Found</h3>
             <p id="dup-message" class="mb-3 text-gray-600 dark:text-gray-300 text-sm"></p>
             <div class="flex flex-col gap-2">
                 <button id="dup-skip" class="bg-gray-200 dark:bg-gray-600 rounded px-3 py-2 text-left text-sm hover:bg-gray-300">Skip</button>
@@ -145,7 +154,7 @@
     </div>
 
     <!-- Notification -->
-    <div id="notification" class="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded shadow-lg text-sm transform translate-y-20 opacity-0 transition-all duration-300"></div>
+    <div id="notification" class="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded shadow-lg text-sm transform translate-y-20 opacity-0 transition-all duration-300" role="status" aria-live="polite"></div>
 
     <script>
         (() => {
@@ -219,10 +228,15 @@
             };
 
             // Utility functions
-            const escapeHTML = str => str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':&#39;}[c]));
+            const escapeHTML = str => str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'\u0027'}[c]));
+            const escapeRegex = str => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-            const escapeCSV = (str, delim) =>
-                str.replace(new RegExp(`[${delim}]`, 'g'), '\\' + delim).replace(/"/g, '""');
+            const escapeCSV = (str, delim) => {
+                const escaped = str.replace(/"/g, '""');
+                return escaped.includes(delim) || escaped.includes('"') || escaped.includes('\n') 
+                    ? `"${escaped}"` 
+                    : escaped;
+            };
 
             const formatContent = str => {
                 let s = str.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\r/g, '').replace(/\\\\/g, '\\');
@@ -236,6 +250,12 @@
             const getUniqueTitle = title => {
                 let n = 1, t = title;
                 while (findDuplicate(t) !== -1) t = `${title} (${n++})`;
+                return t;
+            };
+
+            const getUniqueTitleCI = title => {
+                let n = 1, t = title;
+                while (prompts.some(p => p.title.toLowerCase() === t.toLowerCase())) t = `${title} (${n++})`;
                 return t;
             };
 
@@ -303,7 +323,6 @@
                     let title, content;
 
                     if (idx === -1 && delim === ',') {
-                        // Fallback: try common delimiters
                         const fallback = row.includes('|"') ? '|"' : row.includes('|') ? '|' : null;
                         if (fallback) { idx = row.indexOf(fallback); delim = fallback; }
                     }
@@ -314,8 +333,12 @@
                     } else {
                         title = row.substring(0, idx).trim();
                         content = row.substring(idx + delim.length).trim();
+                        // Unwrap quotes and handle escaped quotes
                         if (content.startsWith('"') && content.endsWith('"')) {
-                            content = content.slice(1, -1);
+                            content = content.slice(1, -1).replace(/""/g, '"');
+                        }
+                        if (title.startsWith('"') && title.endsWith('"')) {
+                            title = title.slice(1, -1).replace(/""/g, '"');
                         }
                     }
                     results.push({title, content});
@@ -462,13 +485,13 @@
                 els.repositoryList.innerHTML = filtered.map(p => {
                     const selected = selectedIndices.has(p.originalIndex);
                     return `<div class="bg-white dark:bg-gray-800 p-3 flex items-center gap-3 text-sm ${selected ? 'prompt-selected' : ''}" data-idx="${p.originalIndex}">
-                        <input type="checkbox" class="w-4 h-4 rounded" ${selected ? 'checked' : ''}>
+                        <input type="checkbox" class="w-4 h-4 rounded" ${selected ? 'checked' : ''} aria-label="Select ${escapeHTML(p.title)}">
                         <div class="flex-grow min-w-0 cursor-pointer" data-action="edit">
                             <div class="font-medium truncate">${escapeHTML(p.title)}</div>
                             <div class="text-xs text-gray-500 truncate">${escapeHTML(p.content.substring(0, 60))}${p.content.length > 60 ? '...' : ''}</div>
                         </div>
-                        <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-xs" data-action="edit" style="color:var(--primary)"><i class="fas fa-edit"></i></button>
-                        <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-xs text-red-500" data-action="delete"><i class="fas fa-trash-alt"></i></button>
+                        <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-xs" data-action="edit" style="color:var(--primary)" aria-label="Edit prompt"><i class="fas fa-edit"></i></button>
+                        <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-xs text-red-500" data-action="delete" aria-label="Delete prompt"><i class="fas fa-trash-alt"></i></button>
                     </div>`;
                 }).join('');
                 updateBatchUI();
@@ -646,6 +669,13 @@
             els.saveEditBtn.addEventListener('click', saveEdit);
             els.editContent.addEventListener('input', () => els.contentCharCount.textContent = els.editContent.value.length);
             els.editModal.addEventListener('keydown', e => { if (e.key === 'Escape') hideModal(els.editModal); });
+            els.dupDialog.addEventListener('keydown', e => {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    if (dupResolve) { dupResolve('skip'); dupResolve = null; }
+                    hideModal(els.dupDialog);
+                }
+            });
 
             // Import modal
             els.closeImportBtn.addEventListener('click', () => hideModal(els.importModal));
@@ -678,6 +708,14 @@
             // Search and sort
             els.sortDropdown.addEventListener('change', render);
             els.searchInput.addEventListener('input', render);
+
+            // Theme toggle
+            els.themeToggle = $('theme-toggle');
+            if (els.themeToggle) {
+                els.themeToggle.addEventListener('click', () => {
+                    document.documentElement.classList.toggle('dark');
+                });
+            }
 
             // Keyboard shortcuts
             document.addEventListener('keydown', e => {
